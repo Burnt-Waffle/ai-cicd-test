@@ -29,10 +29,10 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Builder에서 완성된 가상환경(.venv)째로 복사
-COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder --chown=nobody:nogroup /app/.venv /app/.venv
 
 # 소스 코드 복사
-COPY . .
+COPY --chown=nobody:nogroup . .
 
 # 비루트 사용자로 실행
 USER nobody
