@@ -136,8 +136,8 @@ jobs:
               "    break",
               "  fi",
               
-              "  # [핵심] AI 포트(8000) 및 Health Check 경로(/health) 설정",
-              "  if curl -s -f http://localhost:8000/health > /dev/null; then",
+              "  # AI 포트(8000) 및 Health Check 경로(/api/v1/health) 설정",
+              "  if curl -s -f http://localhost:8000/api/v1/health > /dev/null; then",
               "    echo \"Health Check Passed! Deployment Complete.\"",
               "    IS_HEALTHY=\"true\"",
               "    break",
