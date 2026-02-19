@@ -38,10 +38,11 @@ COPY --chown=nobody:nogroup . .
 USER nobody
 
 # 환경변수
+ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 
 # 포트 노출
 EXPOSE 8000
 
 # 애플리케이션 실행
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/app/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
