@@ -259,6 +259,52 @@ jobs:
             --launch-template "LaunchTemplateId=${{ inputs.lt_id }},Version=${{ steps.update-lt.outputs.VERSION }}"
           echo "ASG Default Version Updated!"
 
+      # 7. SSM을 이용한 프라이빗 내부망 헬스체크
+      - name: Internal Health Check Verification (via SSM)
+        if: success()
+        run: |
+          echo "Checking actual service health from inside the VPC via SSM..."
+          ASG_NAME=${{ inputs.asg_name }}
+          
+          # 1. 방금 ASG에 의해 띄워진 정상(InService) 인스턴스 ID 하나 가져오기
+          INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups \
+            --auto-scaling-group-names $ASG_NAME \
+            --query 'AutoScalingGroups[0].Instances[?LifecycleState==`InService`].InstanceId' \
+            --output text | awk '{print $1}')
+            
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "No InService instances found to run health check."
+            exit 1
+          fi
+
+          echo "Found instance $INSTANCE_ID. Sending SSM command..."
+          
+          # 2. 인스턴스 내부 요원에게 자가 진단(localhost:8000/health) 명령 하달!
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands='["curl -s -f http://localhost:8000/api/v1/health || exit 1"]' \
+            --query "Command.CommandId" \
+            --output text)
+            
+          echo "Waiting for internal health check to complete..."
+          sleep 10
+          
+          # 3. 결과 확인
+          STATUS=$(aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$INSTANCE_ID" \
+            --query "Status" \
+            --output text)
+            
+          if [[ "$STATUS" == "Success" ]]; then
+            echo "Internal Health Check Passed! Real Success!"
+          else
+            echo "Internal Health Check Failed! ASG False-Positive Detected!"
+            aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardErrorContent" --output text
+            exit 1
+          fi
+
       - name: Verify Running Launch Template Version
         if: success()
         run: |
