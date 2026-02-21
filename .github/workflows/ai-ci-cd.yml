@@ -221,7 +221,7 @@ jobs:
       environment: staging
       image_uri: ${{ needs.promote-image.outputs.final_image_uri }}
       asg_name: "raisedeveloper-ai-staging-asg" # AI용 ASG 이름으로 변경 필요
-      lt_id: "lt-xxxxxxxxxxxxxxxxx"             # AI용 Staging LT ID 입력
+      lt_id: "lt-036f21d3b8160909f"             # AI용 Staging LT ID 입력
       pr_number: ${{ github.event.pull_request.number }}
       pr_title: ${{ github.event.pull_request.title }}
       base_ref: ${{ github.base_ref }}
@@ -241,7 +241,7 @@ jobs:
       environment: production
       image_uri: ${{ needs.promote-image.outputs.final_image_uri }}
       asg_name: "raisedeveloper-ai-production-asg" # AI용 ASG 이름으로 변경 필요
-      lt_id: "lt-yyyyyyyyyyyyyyyyy"                # AI용 Production LT ID 입력
+      lt_id: "lt-040a2416fc6894c75"                # AI용 Production LT ID 입력
       pr_number: ${{ github.event.pull_request.number }}
       pr_title: ${{ github.event.pull_request.title }}
       base_ref: ${{ github.base_ref }}
