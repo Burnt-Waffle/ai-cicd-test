@@ -120,7 +120,7 @@ jobs:
               "echo \"3. Pull New Image\"",
               "docker compose pull ai || { echo \"Docker pull failed!\"; exit 1; }",
               
-              "echo \"4. Restart Container\"",
+              "echo \"4. Restart Container with New Image\"",
               "docker compose up -d ai",
 
               "echo \"5. Health Check & Verification\"",
